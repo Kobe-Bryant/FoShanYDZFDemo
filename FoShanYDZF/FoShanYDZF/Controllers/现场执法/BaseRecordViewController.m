@@ -1,0 +1,658 @@
+//
+//  BaserecordViewController.m
+//  GMEPS_HZ
+//
+//  Created by 文 克远 on 13-4-12.
+//   查询数据先从本地暂存的查询，如果没有，就从网络获取
+//
+
+#import "BaseRecordViewController.h"
+#import "WebServiceHelper.h"
+#import "PDJsonkit.h"
+#import "SharedInformations.h"
+#import "GUIDGenerator.h"
+#import "OMGToast.h"
+#import "RecordsHelper.h"
+#import "SystemConfigContext.h"
+#import "ServiceUrlString.h"
+#import "NSDateUtil.h"
+#import "UIAlertView+Blocks.h"
+#import "RIButtonItem.h"
+#import "DisplayAttachFileController.h"
+#import "DXAlertView.h"
+#import "RecordPrintViewController.h"
+
+@interface BaseRecordViewController ()
+@property(nonatomic,retain)NSMutableString *currentdata;
+@property(nonatomic,assign) NSInteger alertType;
+@property(nonatomic, retain) UIBarButtonItem *backItem;
+@property(nonatomic,retain)UIPopoverController *popRecordController;
+@property(nonatomic,assign)BOOL isDTBD;//是否是动态表单
+@property(nonatomic,assign)BOOL showSaveTip;
+
+@end
+
+@implementation BaseRecordViewController
+@synthesize currentdata,alertType,tableName,isHisRecord,dicWryInfo,isDTBD;
+@synthesize recordStatus,popRecordController,dwbh,wrymc,xczfbh,menuTagID,basebh,kckssj,showSaveTip,displayFromLocal;
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+        showSaveTip = NO;
+    }
+    return self;
+}
+
+-(void)returnSites:(NSDictionary*)values outsideComp:(BOOL)bOutside{
+    displayFromLocal = YES;
+    //从本地带入暂存的数据
+    [self queryRecordFromLocal];
+}
+
+-(void)backItemPressed{
+    if(recordStatus == Record_SaveLocal || recordStatus == Record_Commited_Success || isHisRecord == YES)
+    {
+        [self.navigationController popViewControllerAnimated:YES];
+        return;
+    }
+    alertType = kAlert_Choose;
+    UIAlertView *alert = [[UIAlertView alloc]
+                          initWithTitle:@"提示"
+                          message:@"您输入的数据还未提交或暂存，确实要退出吗？"
+                          delegate:self
+                          cancelButtonTitle:@"是"
+                          otherButtonTitles:@"否",nil];
+    alert.alpha = 1.0f;
+    [alert show];
+    return;
+}
+//提交数据到对应的笔录表中
+-(void)commitRecordDatas:(NSDictionary*)value{
+    
+    
+}
+
+//提交数据到主表中
+-(void)commitBaseRecordData:(NSDictionary*)value
+{
+    NSString *jsonStr = [value JSONString];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:5];
+    [params setObject:@"COMIT_BL_BASE_DATA" forKey:@"service"];
+    [params setObject:jsonStr forKey:@"jsonString"];
+    NSString *strUrl = [ServiceUrlString generateUrlByParameters:params];
+    self.webHelper = [[NSURLConnHelper alloc] initWithUrl:strUrl andParentView:self.view delegate:self tipInfo:@"正在提交笔录..." tagID:COMIT_BL_BASE_DATA] ;
+}
+
+//保存主表数据到本地表中
+-(void)saveLocalBaseRecordData:(id)valueDatas
+{
+    NSDictionary *baseTableJson = [self createBaseTableFromWryData:valueDatas];
+    RecordsHelper *helper = [[RecordsHelper alloc] init];
+    BOOL res = [helper saveRecord:baseTableJson andTableName:tableName ];
+    if(res == NO)
+    {
+        NSLog(@"保存笔录主表失败。");
+    }
+}
+
+
+
+-(void)saveLocalRecord:(id)valueDatas
+{    
+    RecordsHelper *helper = [[RecordsHelper alloc] init];
+    BOOL res = [helper saveRecord:valueDatas andTableName:tableName ];
+    
+    if(res&&showSaveTip)
+    {
+        recordStatus= Record_SaveLocal;
+        [OMGToast showWithText:@"记录已暂存在本地！" duration:1.0];
+    }
+    //[self saveLocalBaseRecordData:valueDatas];
+    
+}
+
+-(void)queryRecordFromLocal
+{
+    RecordsHelper *helper = [[RecordsHelper alloc] init];
+    NSDictionary *result = [helper queryRecordByWrymc:self.wrymc andWryBH:dwbh andTableName:tableName];
+    if (result != nil)
+    {
+        [self displayRecordDatas:result];
+    }
+}
+
+-(NSDictionary*)modifyDicValues:(NSDictionary*)val{
+    NSMutableDictionary *dicVal = [NSMutableDictionary dictionaryWithDictionary:val];
+    //处理为<null> 或者nil的情况
+    NSArray *keys = [dicVal allKeys];
+    if ([keys count] > 0) {
+        for(NSString *aKey in keys){
+            id val = [dicVal objectForKey:aKey];
+            if( val == nil || [val isKindOfClass:[NSNull class]]){
+                [dicVal setObject:@"" forKey:aKey];
+            }
+        }
+    }
+    return dicVal;
+}
+
+//根据值来显示值
+-(void)displayRecordDatas:(NSDictionary*)values
+{
+    
+}
+
+-(void)generateBaseBH
+{
+    self.basebh = [GUIDGenerator generateGUID];
+}
+
+-(void)generateXCZFBH
+{
+    self.xczfbh = [GUIDGenerator generateBHByWryName:wrymc andWrybh:dwbh];
+}
+
+-(NSMutableDictionary*)createBaseTableFromWryData:(NSDictionary*)value
+{
+    NSMutableDictionary *dicParams = [NSMutableDictionary dictionaryWithCapacity:25];
+    if(value != nil)
+    {
+        [dicParams setValue:[value objectForKey:@"WRYBH"] forKey:@"WRYBH"];
+        [dicParams setValue:[value objectForKey:@"WRYMC"] forKey:@"WRYMC"];
+        if(bOutSide == NO)
+        {
+            [dicParams setValue:[value objectForKey:@"DWDZ"] forKey:@"WRYDZ"];
+            [dicParams setValue:[value objectForKey:@"FDDBR"] forKey:@"FDDBR"];
+            [dicParams setValue:[value objectForKey:@"HBLXR"] forKey:@"HBFZR"];
+            [dicParams setValue:[value objectForKey:@"HBRLXDH"] forKey:@"HBFZRDH"];
+            [dicParams setValue:[value objectForKey:@"JDD"] forKey:@"JDD"];
+            [dicParams setValue:[value objectForKey:@"JDF"] forKey:@"JDF"];
+            [dicParams setValue:[value objectForKey:@"JDM"] forKey:@"JDM"];
+            [dicParams setValue:[value objectForKey:@"WDD"] forKey:@"WDD"];
+            [dicParams setValue:[value objectForKey:@"WDF"] forKey:@"WDF"];
+            [dicParams setValue:[value objectForKey:@"WDM"] forKey:@"WDM"];
+            [dicParams setValue:[value objectForKey:@"XZQY"] forKey:@"XZQY"];//行政区域
+            [dicParams setValue:[value objectForKey:@"SSHY"] forKey:@"SSHY"];
+            [dicParams setValue:[value objectForKey:@"QYLX"] forKey:@"QYLX"];
+        }
+    }
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm"];
+    NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
+    
+    NSDictionary *userInfo = [[SystemConfigContext sharedInstance] getUserInfo];
+    NSString *jcrbmmc = [[SystemConfigContext sharedInstance] getUserBMMC];
+    
+    [dicParams setObject:[userInfo objectForKey:@"userId"] forKey:@"CJR"];
+    [dicParams setObject:[userInfo objectForKey:@"uname"] forKey:@"JCR"];//检查人
+    [dicParams setObject:[userInfo objectForKey:@"userId"] forKey:@"JCRBH"];//检查人ID
+    [dicParams setObject:jcrbmmc forKey:@"JCRBM"];//检查人部门名称
+    [dicParams setObject:[userInfo objectForKey:@"depart"] forKey:@"JCRBMBH"];//检查人部门编号
+    [dicParams setObject:dateString forKey:@"CJSJ"];
+    [dicParams setObject:[userInfo objectForKey:@"userId"]  forKey:@"XGR"];
+    [dicParams setObject:dateString forKey:@"XGSJ"];
+    [dicParams setObject:[userInfo objectForKey:@"orgid"] forKey:@"ORGID"];
+    [dicParams setObject:@"iPad" forKey:@"ZDLX"];
+    [dicParams setObject:[userInfo objectForKey:@"sjqx"] forKey:@"SJQX"];
+    [dicParams setObject:dateString forKey:@"JSSJ"];
+    
+    [dicParams setObject:xczfbh forKey:@"XCZFBH"];
+    [dicParams setObject:basebh forKey:@"BH"];
+    
+    return dicParams;
+}
+
+-(NSDictionary*)parseBaseTableFromJsonstr:(NSString*)jsonStr
+{
+    NSDictionary *value = [jsonStr objectFromJSONString];
+    NSMutableDictionary *dicParams = [NSMutableDictionary dictionaryWithCapacity:25];
+    if(value != nil)
+    {
+        [dicParams setValue:[value objectForKey:@"WRYBH"] forKey:@"WRYBH"];
+        [dicParams setValue:[value objectForKey:@"WRYMC"] forKey:@"WRYMC"];
+        [dicParams setValue:[value objectForKey:@"WRYDZ"] forKey:@"DWDZ"];
+        [dicParams setValue:[value objectForKey:@"FDDBR"] forKey:@"FDDBR"];
+        [dicParams setValue:[value objectForKey:@"HBFZR"] forKey:@"HBLXR"];
+        [dicParams setValue:[value objectForKey:@"HBFZRDH"] forKey:@"HBRLXDH"];
+        [dicParams setValue:[value objectForKey:@"JDD"] forKey:@"JDD"];
+        [dicParams setValue:[value objectForKey:@"JDF"] forKey:@"JDF"];
+        [dicParams setValue:[value objectForKey:@"JDM"] forKey:@"JDM"];
+        [dicParams setValue:[value objectForKey:@"WDD"] forKey:@"WDD"];
+        [dicParams setValue:[value objectForKey:@"WDF"] forKey:@"WDF"];
+        [dicParams setValue:[value objectForKey:@"WDM"] forKey:@"WDM"];
+        [dicParams setValue:[value objectForKey:@"XZQY"] forKey:@"XZQY"];
+        [dicParams setValue:[value objectForKey:@"SSHY"] forKey:@"SSHY"];
+        [dicParams setValue:[value objectForKey:@"QYLX"] forKey:@"QYLX"];
+    }
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm"];
+    NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
+    
+    NSDictionary *userInfo = [[SystemConfigContext sharedInstance] getUserInfo];
+    
+    [dicParams setObject:[userInfo objectForKey:@"userId"] forKey:@"CJR"];
+    [dicParams setObject:dateString forKey:@"CJSJ"];
+    [dicParams setObject:[userInfo objectForKey:@"userId"]  forKey:@"XGR"];
+    [dicParams setObject:dateString forKey:@"XGSJ"];
+    [dicParams setObject:[userInfo objectForKey:@"orgid"] forKey:@"ORGID"];
+    [dicParams setObject:@"iPad" forKey:@"ZDLX"];
+    [dicParams setObject:[userInfo objectForKey:@"sjqx"] forKey:@"SJQX"];
+    [dicParams setObject:dateString forKey:@"JSSJ"];
+    
+    
+    return dicParams;
+}
+
+//查看历史记录
+-(void)historyBilu:(id)sender
+{
+    if (popRecordController == nil)
+    {
+        ChooseRecordViewController *tmpController =
+        [[ChooseRecordViewController alloc] initWithStyle:UITableViewStylePlain];
+        tmpController.blName = tableName;
+        tmpController.wrymc = wrymc;
+        
+        tmpController.wrybh = self.dwbh;
+        
+        tmpController.contentSizeForViewInPopover = CGSizeMake(600, 400);
+        tmpController.delegate = self;
+        
+        UINavigationController *tmpNav = [[UINavigationController alloc] initWithRootViewController:tmpController];
+        UIPopoverController *tmpPopover = [[UIPopoverController alloc] initWithContentViewController:tmpNav];
+        self.popRecordController = tmpPopover;
+        [tmpController.tableView reloadData];
+    }
+    
+    [popRecordController dismissPopoverAnimated:NO];
+    
+	[self.popRecordController presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+}
+
+//暂存
+-(void)saveBilu:(id)sender
+{
+    if (sender == nil)
+    {
+        showSaveTip = NO;
+    }
+    else
+    {
+        showSaveTip = YES;
+    }
+}
+
+//提交
+-(void)commitBilu:(id)sender
+{
+    _backItem.enabled = NO;
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (alertType == kAlert_Choose)
+    {
+        if (buttonIndex == 0)
+        {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else if(buttonIndex == 1)
+        {
+              
+        }
+    }
+    else if(alertType == kAlert_GenXCZFBH)
+    {
+        if (buttonIndex == 0)
+        {
+            self.xczfbh = [GUIDGenerator generateBHByWryName:self.wrymc];
+        }
+        else
+        {
+            [self selectPolutionSrc];
+        }
+    }
+    
+    if (recordStatus == Record_Commited_Success)
+    {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+-(void)selectPolutionSrc{
+	
+	UISearchSitesController *formViewController = [[UISearchSitesController alloc] initWithNibName:@"UISearchSitesController" bundle:nil];
+	[formViewController setDelegate:self];
+	UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:formViewController];
+	nav.modalPresentationStyle =  UIModalPresentationFormSheet;
+	[self presentModalViewController:nav animated:YES];
+	nav.view.superview.frame = CGRectMake(30, 100, 700, 700);
+	// nav.view.superview.center = self.view.center;
+	
+}
+
+-(void)requestHistoryData
+{
+    displayFromLocal = NO;
+    isHisRecord = YES;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+	// Do any additional setup after loading the view.
+    self.title = wrymc;
+    
+    if([basebh length] == 0)
+    {
+        //做笔录
+        UIToolbar *tool = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 190, 44)];
+        
+        UIBarButtonItem *qyButton = [[UIBarButtonItem alloc] initWithTitle:@"历史笔录" style:UIBarButtonItemStyleDone target:self action:@selector(historyBilu:)];
+        
+        UIBarButtonItem *saveButton = [[UIBarButtonItem alloc]initWithTitle:@"暂存" style:UIBarButtonItemStyleDone target:self action:@selector(saveBilu:)];
+        
+        UIBarButtonItem *commitButton = [[UIBarButtonItem alloc]initWithTitle:@"提交" style:UIBarButtonItemStyleDone target:self action:@selector(commitBilu:)];
+        
+        NSMutableArray* buttons = [[NSMutableArray alloc] initWithCapacity:2];
+        [buttons addObject:qyButton];
+        [buttons addObject:saveButton];
+        [buttons addObject:commitButton];
+        
+        [tool setItems:buttons animated:NO];
+        UIBarButtonItem *myBItem = [[UIBarButtonItem alloc] initWithCustomView:tool];
+        self.navigationItem.rightBarButtonItem = myBItem;
+        
+        //导航左边部分
+        UIToolbar *tool1 = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 110, 44)];
+        _backItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:@selector(backItemPressed)];
+        NSMutableArray* buttons1 = [[NSMutableArray alloc] initWithCapacity:8];
+        [buttons1 addObject:_backItem];
+        [tool1 setItems:buttons1 animated:NO];
+        
+        UIBarButtonItem *myBItem1 = [[UIBarButtonItem alloc] initWithCustomView:tool1];
+        self.navigationItem.leftBarButtonItem = myBItem1;
+        
+        btnTitleView = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        btnTitleView.tintColor = [UIColor lightGrayColor];
+        btnTitleView.frame = CGRectMake(0, 0, 350, 35);
+        
+        [btnTitleView setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+        self.navigationItem.titleView  = btnTitleView;
+        
+        if ([dwbh length] > 0)
+        {
+            //企业已经确定，从任务或污染源详情做笔录
+            NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:5];
+            [params setObject:@"QUERY_YDZF_WRY_DATA" forKey:@"service"];
+            [params setObject:dwbh forKey:@"wrybh"];
+            NSString *strUrl = [ServiceUrlString generateUrlByParameters:params];
+            self.webHelper = [[NSURLConnHelper alloc] initWithUrl:strUrl andParentView:self.view delegate:self tipInfo:@"正在查询数据..." tagID:QUERY_YDZF_WRY_DATA] ;
+        }
+        else
+        {
+            // 选择污染源做笔录
+            [btnTitleView addTarget:self action:@selector(selectPolutionSrc) forControlEvents:UIControlEventTouchUpInside];
+            [self selectPolutionSrc];
+        }
+    }
+    else
+    {
+        // 查看详情，不是做笔录
+        [self requestHistoryData];
+        isHisRecord = YES;
+    }
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+}
+
+#pragma mark - ChooseRecordDelegate delegate
+
+-(void)returnHistoryRecord:(NSDictionary*)valuesData
+{
+    [self displayRecordDatas:valuesData];
+    [popRecordController dismissPopoverAnimated:YES];
+}
+
+//网络查询现场执法编号
+-(void)queryXCZFBH
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:5];
+    [params setObject:@"QUERY_XCZFBH" forKey:@"service"];
+    if([xczfbh length] > 0)
+    {
+        [params setObject:xczfbh forKey:@"xczfbh"];
+    }
+    else
+    {
+        if([dwbh length] > 0)
+        {
+            [params setObject:dwbh forKey:@"wrybh"];
+        }
+        else
+        {
+            [params setObject:wrymc forKey:@"wrymc"];
+        }
+    }
+    
+    NSString *strUrl = [ServiceUrlString generateUrlByParameters:params];
+    self.webHelper = [[NSURLConnHelper alloc] initWithUrl:strUrl andParentView:self.view delegate:self tipInfo:@"正在查询数据..." tagID:QUERY_XCZFBH] ;
+}
+
+-(void)processError:(NSError *)error
+{
+    [self showAlertMessage:@"获取数据出错，请检查网络设置!"];
+}
+
+-(void)processWebData:(NSData*)webData andTag:(NSInteger)tag
+{
+    if([webData length] <=0 )
+    {
+        NSString *msg = @"查询数据失败";
+        [self showAlertMessage:msg];
+        return;
+    }
+    NSString *resultJSON = [[NSString alloc] initWithBytes: [webData bytes] length:[webData length] encoding:NSUTF8StringEncoding];
+    
+    if(tag == QUERY_XCZFBH)
+    {
+        NSDictionary *dicResult = [resultJSON objectFromJSONString];
+        if(dicResult && [dicResult isKindOfClass:[NSDictionary class]])
+        {
+            
+            if([xczfbh length] > 0)
+            {
+                //说明是从任务中来的 执法编号已经确定，不用再判断
+                if([basebh length] <=0)
+                {
+                    [self generateBaseBH];
+                }
+                [self xczfbhHasGenerated];
+                return;
+            }
+            
+            self.xczfbh = [dicResult objectForKey:@"XCZFBH"];
+            self.basebh = [dicResult objectForKey:@"BH"];
+            
+            //计算时间间隔
+            NSString *tmpXgsj = [dicResult objectForKey:@"XGSJ"];
+            self.kckssj = [dicResult objectForKey:@"KSSJ"];
+            NSDate *xgsj = [NSDateUtil dateFromString:tmpXgsj andTimeFMT:@"yyyy-MM-dd HH:mm"];
+            if(xgsj == nil)
+            {
+                xgsj = [NSDateUtil dateFromString:tmpXgsj andTimeFMT:@"yyyy-MM-dd"];
+            }
+            NSDate *nowDate =[NSDate date];
+            NSInteger days = [nowDate timeIntervalSinceDate:xgsj]/(24*60*60);
+            
+            if (days == 0)
+            {
+                // 表示同一天任务
+                if([xczfbh length] <= 0)
+                {
+                    [self generateXCZFBH];
+                }
+                if([basebh length] <= 0)
+                {
+                    [self generateBaseBH];
+                }
+            }
+            else if (days > 0 && days < 3)
+            {
+                // 表示三天内的任务
+                NSString *tip = [NSString stringWithFormat:@"系统检测您在%@对当前污染源做过执法记录，请问是否为同一执法行为？",tmpXgsj];
+                [[[UIAlertView alloc] initWithTitle:@"提示"
+                                            message:tip
+                                   cancelButtonItem:[RIButtonItem itemWithLabel:@"是" action:^{
+                    
+                    if([xczfbh length] <= 0)
+                    {
+                        [self generateXCZFBH];
+                    }
+                    if([basebh length] <= 0)
+                    {
+                        [self generateBaseBH];
+                    }
+                    
+                }] otherButtonItems:[RIButtonItem itemWithLabel:@"否" action:^{
+                    
+                    [self generateXCZFBH];
+                    [self generateBaseBH];
+                    
+                    
+                }], nil] show];
+            }
+            else
+            {
+                [self generateXCZFBH];
+                [self generateBaseBH];
+            }
+        }
+        else
+        {
+            [self generateXCZFBH];
+            [self generateBaseBH];
+        }
+        
+        [self xczfbhHasGenerated];
+    }
+    else if(tag == QUERY_YDZF_WRY_DATA)
+    {
+        NSDictionary *dicResult = [resultJSON objectFromJSONString];
+        if([dicResult isKindOfClass:[NSDictionary class]])
+        {
+            if([[dicResult allKeys] count] <= 0)
+            {
+                NSString *msg = @"获取污染源数据失败";
+                [self showAlertMessage:msg];
+                return;
+            }
+            else
+            {
+                [self returnSites:dicResult outsideComp:NO];
+            }
+        }
+        else
+        {
+            NSString *msg = @"获取污染源数据失败";
+            [self showAlertMessage:msg];
+            return;
+        } 
+    }
+    else if(tag == COMIT_BL_BASE_DATA)
+    {
+        NSRange result = [resultJSON rangeOfString:@"success"];
+        if (result.location!= NSNotFound)
+        {
+            recordStatus = Record_Commited_Success;
+            NSString* leftButtonTitle = nil;
+            //现场检查（勘查）笔录 调查询问笔录 污染源现场检查记录表 现场环境监察整改意见书 这四个文书支持打印
+            if ([self.tableName isEqualToString:XCKCBL_TableName] || [self.tableName isEqualToString:DCXWBL_TableName] || [self.tableName isEqualToString:WRYXCJCJLB_TableName] || [self.tableName isEqualToString:XCHJJCZGYJS_TableName])
+            {
+                leftButtonTitle = @"打印预览";
+            }
+            
+            DXAlertView *alert = [[DXAlertView alloc] initWithTitle:@"提示" contentText:@"笔录提交成功！" leftButtonTitle:leftButtonTitle rightButtonTitle:@"确定" statusImage:[UIImage imageNamed:@"success"]];
+            [alert show];
+            alert.leftBlock = ^() {
+                NSLog(@"left button clicked");
+                [self printPreview];
+            };
+            alert.rightBlock = ^() {
+                NSLog(@"left button clicked");
+                
+            };
+            alert.dismissBlock = ^() {
+                NSLog(@"Do something interesting after dismiss block");
+            };
+            [self saveBilu:nil];
+            return;
+        }
+        else
+        {
+            DXAlertView *alert = [[DXAlertView alloc] initWithTitle:@"错误" contentText:@"笔录提交失败！" leftButtonTitle:nil rightButtonTitle:@"确定" statusImage:[UIImage imageNamed:@"error.png"]];
+            [alert show];
+            alert.rightBlock = ^() {
+                
+            };
+            alert.dismissBlock = ^() {
+                NSLog(@"Do something interesting after dismiss block");
+            };
+        }
+    }
+}
+
+//从本地查询现场执法编号
+-(void)queryXCZFBHFromLocal
+{
+    
+}
+
+-(void)xczfbhHasGenerated
+{
+    
+}
+
+//打印预览
+-(void)printPreview
+{
+    RecordPrintViewController *recordPrint = [[RecordPrintViewController alloc] initWithNibName:@"RecordPrintViewController" bundle:nil];
+    if([self.tableName isEqualToString:XCKCBL_TableName])
+    {
+        //现场检查（勘查）笔录
+        recordPrint.type = @"XCKCBL";
+    }
+    else if([self.tableName isEqualToString:DCXWBL_TableName])
+    {
+        //调查询问笔录
+        recordPrint.type = @"DCXWBL";
+    }
+    else if([self.tableName isEqualToString:WRYXCJCJLB_TableName])
+    {
+        //污染源现场检查记录表
+        recordPrint.type = @"WRYXCJCJLB";
+    }
+    else if([self.tableName isEqualToString:XCHJJCZGYJS_TableName])
+    {
+        //现场环境监察整改意见书
+        recordPrint.type = @"XCHJJCZGYJS";
+    }
+    recordPrint.glbh = self.xczfbh;
+    [self.navigationController pushViewController:recordPrint animated:YES];
+}
+
+@end

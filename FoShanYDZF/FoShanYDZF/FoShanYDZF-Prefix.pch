@@ -1,0 +1,83 @@
+//
+// Prefix header for all source files of the 'FoShanYDZF' target in the 'FoShanYDZF' project
+//
+
+
+#import <Availability.h>
+
+#ifndef __IPHONE_3_0
+#warning "This project uses features only available in iOS SDK 3.0 and later."
+#endif
+
+#ifdef __OBJC__
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#endif
+
+#ifdef DEBUG
+#define DLog(...) NSLog(@"%s %@", __PRETTY_FUNCTION__, [NSString stringWithFormat:__VA_ARGS__])
+
+#else
+#define DLog(...) do { } while (0)
+#endif
+
+//数据同步完毕
+#define kNotifyDataSyncFininshed @"DataSyncFinished"
+#define kNotifyDataSyncFailed    @"kNotifyDataSyncFailed"
+
+//菜单数据同步完毕
+#define kMenuSyncFailed   @"kMenuSyncFailed"
+#define kMenuSyncFinished @"kMenuSyncFinished"
+
+#define kLastSyncDate @"LastSyncDate"
+
+#define KUserName @"KUserName"
+#define KUserPassword @"KUserPassword"
+#define KSavePwd @"KSavePwd"
+#define kLoadHbsc @"kLoadHbsc"
+#define kLastVersion @"kLastVersion" //上一个版本
+#define kLoginSyncDate @"LoginSyncDate"
+
+#define LIGHT_BLUE_UICOLOR [UIColor colorWithRed:231.0/255 green:240.0/255 blue:236.0/255 alpha:1]
+
+#define ONE_PAGE_SIZE 25
+
+//如果定义此宏，表示记录请求的webservice，否则不记录
+#define Save_OperateLog
+
+#define kLaiWen_Type_Tag @"7a6ef941-02a7-42f7-bebd-0cef3633b781" //来文登记
+
+#define kConfigPath @"config"
+
+//应用程序更新相关
+#define Update_Check_URL @"http://222.92.101.82:8080/fsydzf/version.json" //检查更新地址
+#define Update_Download_URL @"http://222.92.101.82:8080/fsydzf/updateapp.html" //下载地址
+
+//执法相关
+#define kAlert_Choose     1 //选择确定、取消
+#define kAlert_GenXCZFBH 2 //现场执法编号
+
+#define XCKCBL_NAME @"现场检查（勘察）笔录"
+#define FJXX_NAME @"现场监察附件"
+#define DCXWBL_NAME @"调查询问笔录"
+#define WRYXCJCJLB_NAME @"污染源现场检查记录表"
+#define XCHJJCZGYJS_NAME @"现场环境监察整改意见书"
+#define XFDCJLD_NAME @"信访调查记录单" 
+
+//支持打印的笔录的名称、类型
+#define XCKCBL_TableName @"T_YDZF_XCKCBL" //现场检查（勘查）笔录
+#define DCXWBL_TableName @"T_YDZF_DCXWBL" //调查询问笔录 + 问答表
+#define WRYXCJCJLB_TableName @"T_YDZF_WRYXCJCJLB" //污染源现场检查记录表
+#define XCHJJCZGYJS_TableName @"T_YDZF_XCHJJCZGYJS" //现场环境监察整改意见书
+
+//笔录相关
+#define Record_None      0 //没做任何处理
+#define Record_SaveLocal 11 //暂存在本地
+#define Record_Commited_Success 12 //提交记录成功
+#define Record_Commited_Failed  13 //提交记录失败
+
+#define HBSC_DB_NAME  @"hbsc_data" //环保手册数据库名称
+
+#if !__has_feature(objc_instancetype)
+#define instancetype id
+#endif

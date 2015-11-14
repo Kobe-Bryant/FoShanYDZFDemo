@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DbTables</key>
+	<array>
+		<string>CREATE TABLE if not exists T_USERS (USERNAME VARCHAR(50),USERID VARCHAR(50),DEPARTMENT VARCHAR(100),CJSJ VARCHAR(30));</string>
+		<string>CREATE TABLE if not exists T_MSG_RECORD ( LOGINUSER VARCHAR(50),TALKUSER VARCHAR(50),MSG VARCHAR(500),CJSJ VARCHAR(30));</string>
+		<string>CREATE TABLE if not exists T_EXCEPTION_RECORD ( ID VARCHAR(50),USERID VARCHAR(50),SOFTINFO VARCHAR(200),SBBH VARCHAR(50),EXCEPTION VARCHAR(500),CJSJ VARCHAR(30),STATUS INTEGER);</string>
+		<string>CREATE TABLE  if not exists  T_ADMIN_RMS_YH(YHID VARCHAR(50) PRIMARY KEY,YHMC VARCHAR(100) NULL,YHZW VARCHAR(50) NULL,YHSJ VARCHAR(50) NULL,BGDH VARCHAR(50) NULL,PYJX VARCHAR(50) NULL,BMBH VARCHAR(50) NULL,XB VARCHAR(2) NULL,SFYX VARCHAR(10) NULL,SFZG VARCHAR(10) NULL,PXH INTEGER,ORGID VARCHAR(50) NULL,YHBJ VARCHAR(50) NULL,CJSJ  VARCHAR(50) NULL,XGSJ  VARCHAR(50) NULL,ZDYS VARCHAR(50) NULL,YHJB VARCHAR(50) NULL,YHCW VARCHAR(50) NULL,HBID VARCHAR(20) NULL,TP VARCHAR(10) NULL,SFLD VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE   if not exists T_ADMIN_RMS_ZZJG(ZZBH VARCHAR(50) NOT NULL,ZZJC VARCHAR(500) NULL,ZZQC VARCHAR(500) NULL,ZZDH VARCHAR(50) NULL,SJZZXH VARCHAR(50) NULL,PXH INTEGER,PYJX VARCHAR(50) NULL,CJSJ  VARCHAR(50) NULL,XGSJ  VARCHAR(50) NULL,LXDH VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE   if not exists T_OPERATE_LOG(USERID VARCHAR(50) NOT NULL,WEBSERVICE VARCHAR(50) NULL,CJSJ  VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE  if not exists  T_ADMIN_RMS_YH_TEMP(YHID VARCHAR(50) NOT NULL,YHMC VARCHAR(100) NULL,YHZW VARCHAR(50) NULL,YHSJ VARCHAR(50) NULL,BGDH VARCHAR(50) NULL,PYJX VARCHAR(50) NULL,BMBH VARCHAR(50) NULL,XB VARCHAR(2) NULL,SFYX VARCHAR(10) NULL,SFZG VARCHAR(10) NULL,PXH INTEGER,ORGID VARCHAR(50) NULL,YHBJ VARCHAR(50) NULL,CJSJ  VARCHAR(50) NULL,XGSJ  VARCHAR(50) NULL,ZDYS VARCHAR(50) NULL,YHJB VARCHAR(50) NULL,YHCW VARCHAR(50) NULL,HBID VARCHAR(20) NULL,TP VARCHAR(10) NULL,SFLD VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE   if not exists T_ADMIN_RMS_ZZJG_TEMP(ZZBH VARCHAR(50) NOT NULL,ZZJC VARCHAR(500) NULL,ZZQC VARCHAR(500) NULL,ZZDH VARCHAR(50) NULL,SJZZXH VARCHAR(50) NULL,PXH INTEGER,PYJX VARCHAR(50) NULL,CJSJ  VARCHAR(50) NULL,XGSJ  VARCHAR(50) NULL,LXDH VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE if not exists T_DESKTOP( YHID VARCHAR(50) NULL, CDBH VARCHAR(100) NULL,XH VARCHAR(100) NULL,  SSXT VARCHAR(100) NULL,  CJR VARCHAR(30) NULL, CJSJ VARCHAR(50) NULL, XGR VARCHAR(30) NULL, ORGID VARCHAR(100) NULL)</string>
+		<string>CREATE TABLE if not exists T_USER_LOCATION( _ID INTEGER PRIMARY KEY AUTOINCREMENT,USERID VARCHAR(50) NOT NULL,LAT VARCHAR(50) NULL,LON VARCHAR(50) NULL,CREATETIME VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE if not exists T_MENUS( XH VARCHAR(100) PRIMARY KEY, SSXT VARCHAR(100) NULL, CDXH VARCHAR(100) NULL, CDMC VARCHAR(50) NULL, FCDXH
+            VARCHAR(100) NULL,  SFYX  INTEGER, PXH  INTEGER, TPWZ VARCHAR(100) NULL, LJDZ VARCHAR(100) NULL, BZ VARCHAR(100) NULL, CJR VARCHAR(30) NULL, CJSJ VARCHAR(50) NULL, XGR VARCHAR(30) NULL, XGSJ VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE if not exists T_CLIENT_MENU( YHID VARCHAR(50) NULL, CDBH VARCHAR(100) NULL,XH VARCHAR(100) NULL,  SSXT VARCHAR(100) NULL,  CJR VARCHAR(30) NULL, CJSJ VARCHAR(50) NULL, XGR VARCHAR(30) NULL, ORGID VARCHAR(100) NULL)</string>
+		<string>CREATE TABLE if not exists T_JCGL_XCZF_JBXX(BH VARCHAR(100)  ,XCZFBH VARCHAR(100), WRYBH VARCHAR(100), WRYMC VARCHAR(200),WRYDZ VARCHAR(200),FDDBR        VARCHAR(100), FDDBRDH              VARCHAR(100), HBFZR   VARCHAR(100), HBFZRDH        VARCHAR(100),XZQY    VARCHAR(20),SSHY                 VARCHAR(20),QYLX    VARCHAR(20), KSSJ    VARCHAR(50),JSSJ    VARCHAR(50), JCRBMBH    VARCHAR(100), JCRBM     VARCHAR(100), JCRBH   VARCHAR(100),JCR                  VARCHAR(100),SFHG       VARCHAR(1),SSHBBM       VARCHAR(20),JDD    INTEGER,JDF       INTEGER,JDM   INTEGER,  WDD      INTEGER, WDF         INTEGER,WDM        INTEGER, RWBH        VARCHAR(100), RWLX         VARCHAR(20), ZFLX  VARCHAR(20), ZFLXXL   VARCHAR(20), BZ         VARCHAR(200),  ZDLX    VARCHAR(20),  SJQX      VARCHAR(10), CJR          VARCHAR(50),CJSJ        VARCHAR(50),  XGR    VARCHAR(50), XGSJ      VARCHAR(50),ORGID       VARCHAR(50))</string>
+		<string>CREATE TABLE if not exists T_YDZF_DCXWBL(BH nvarchar(100) NULL PRIMARY KEY,WRYBH varchar(50) NULL,WRYMC varchar(200) NULL,XCZFBH varchar(100) NULL,KSSJ datetime NULL,JSSJ datetime NULL,DD varchar(200) NULL,TQ varchar(50) NULL,BXWR varchar(50) NULL,SFZH varchar(50) NULL,GZDWJZW varchar(100) NULL,LXDH varchar(50) NULL,BXWRDZ varchar(500) NULL,YZBM varchar(50) NULL,YBAGX varchar(100) NULL,XWR varchar(500) NULL,JLR varchar(50) NULL,CYR varchar(500) NULL,HBBM varchar(50) NULL,ZFRY varchar(500) NULL,ZFZH varchar(500) NULL,ZJYY nvarchar(20) NULL,YYLY nvarchar(250) NULL,SQHB nvarchar(30) NULL,HBLY nvarchar(250) NULL,WD nvarchar(4000) NULL,BXWRYJ nvarchar(2000) NULL,BZ nvarchar(200) NULL,SJQX nvarchar(10) NULL,CJR varchar(50) NULL,CJSJ datetime NULL,XGR varchar(50) NULL,XGSJ datetime NULL,ORGID varchar(50) NULL,WFLX varchar(50) NULL,XB varchar(2) NULL,GZDW varchar(100) NULL,ZW varchar(100) NULL,NL varchar(50) NULL)</string>
+		<string>CREATE TABLE if not exists T_YDZF_WDB( BH VARCHAR(50) NULL, BLBH VARCHAR(100) NULL,BLLX VARCHAR(100) NULL,  WT VARCHAR(500) NULL,  DA VARCHAR(500) NULL, PXH INTEGER,CJR VARCHAR(50) NULL,CJSJ VARCHAR(50) NULL, XGR VARCHAR(30) NULL, XGSJ VARCHAR(50) NULL,ORGID VARCHAR(100) NULL)</string>
+		<string>CREATE TABLE if not exists T_YDZF_XCKCBL(BH nvarchar(100) NULL,WRYBH nvarchar(50) NULL,WRYMC varchar(100) NULL,XCZFBH varchar(100) NULL,KCKSSJ datetime NULL,KCJSSJ datetime NULL,KCDD varchar(100) NULL,TQ varchar(50) NULL,KCDWFDMC nvarchar(100) NULL,DWDZ varchar(200) NULL,YB varchar(50) NULL,FDDBR varchar(50) NULL,FDDBRLXDH nvarchar(50) NULL,XCFZR varchar(50) NULL,GMSHHM varchar(50) NULL,GZDWJZW varchar(50) NULL,XCFZRLXDH varchar(50) NULL,JCR varchar(500) NULL,JLR varchar(50) NULL,QTCJRXX varchar(500) NULL,HBBM nvarchar(50) NULL,ZFRXM varchar(500) NULL,ZFZH varchar(500) NULL,ZJYY varchar(50) NULL,YYLY nvarchar(250) NULL,SQHB varchar(50) NULL,HBLY varchar(200) NULL,XCQK nvarchar(3000) NULL,SYYJ nvarchar(1000) NULL,BLLX varchar(50) NULL,BZ nvarchar(200) NULL,SJQX nvarchar(10) NULL,CJR varchar(50) NULL,CJSJ datetime NULL,XGR varchar(50) NULL,XGSJ datetime NULL,ORGID varchar(50) NULL,YBAGX varchar(50) NULL,GZDW varchar(100) NULL,ZW varchar(100) NULL,NL varchar(50) NULL)</string>
+		<string>CREATE TABLE if not exists T_YDZF_WRYXCJCJLB(BH nvarchar(100) NULL,XCZFBH varchar(100) NULL,WRYBH varchar(50) NULL,WRYMC varchar(200) NULL,WRYDZ varchar(4000) NULL,FDDBR varchar(50) NULL,FDDBRDH varchar(50) NULL,JCR varchar(100) NULL,ZFZH varchar(100) NULL,SFCSZJ varchar(10) NULL,SFGZ varchar(10) NULL,ZFSJ datetime NULL,SFHPSP varchar(10) NULL,HPSPSJ datetime NULL,ZYSPSCSP varchar(2000) NULL,SFHPYS varchar(10) NULL,HPYSSJ datetime NULL,SFCZKJ varchar(10) NULL,KJSB varchar(2000) NULL,SCGY varchar(2000) NULL,PWXKZQK varchar(10) NULL,YJYAQK varchar(10) NULL,FZCSCSM varchar(2000) NULL,FSYZQK varchar(10) NULL,FSYXJLQK varchar(10) NULL,FSPWGDBSQK varchar(10) NULL,FSXGGYLCT varchar(10) NULL,FSXGPWKBZP varchar(10) NULL,FQYZQK varchar(10) NULL,FQYXJLQK varchar(10) NULL,FQPWGDBSQK varchar(10) NULL,FQXGGYLCT varchar(10) NULL,FQXGPWKBZP varchar(10) NULL,ZXJCSBAZ varchar(10) NULL,ZXJCSBYX varchar(10) NULL,ZXJCSBYXXSH varchar(10) NULL,PH varchar(100) NULL,COD varchar(100) NULL,NHN varchar(100) NULL,TCU varchar(100) NULL,TNI varchar(100) NULL,SO varchar(100) NULL,NO varchar(100) NULL,YC varchar(100) NULL,SBDS varchar(100) NULL,QT varchar(100) NULL,HYQK varchar(10) NULL,HYYXQK varchar(10) NULL,HYBZCYXBZ varchar(2000) NULL,WXFWZCKQ varchar(10) NULL,ZCBGFBZ varchar(2000) NULL,CJSCQK varchar(10) NULL,WXFWZYQK varchar(10) NULL,CSWZY varchar(10) NULL,CSWZR varchar(10) NULL,XCCYQK varchar(10) NULL,QTWZCY varchar(2000) NULL,HBDAJSQK varchar(10) NULL,QTQK varchar(2000) NULL,CZWTHZ varchar(2000) NULL,XCJCJL varchar(2000) NULL,CJR varchar(50) NULL,CJSJ datetime NULL,XGR varchar(50) NULL,XGSJ datetime NULL,ORGID varchar(50) NULL,JGXZ varchar(10) NULL)</string>
+		<string>CREATE TABLE if not exists T_YDZF_XCHJJCZGYJS(BH varchar(100) NULL,WRYBH varchar(50) NULL,WRYMC varchar(100) NULL,XCZFBH varchar(100) NULL,WRYDC varchar(200) NULL,FDDBR varchar(50) NULL,FDDBRLXDH varchar(50) NULL,SCQK varchar(50) NULL,QTSCQK varchar(50) NULL,GSZZ varchar(50) NULL,XKGJXMQK varchar(50) NULL,HPSPWH varchar(100) NULL,HPSPSJ datetime NULL,SSCWH varchar(100) NULL,SSCSJ datetime NULL,HBYSWH varchar(100) NULL,HBYSSJ datetime NULL,ZYSCSB varchar(2000) NULL,FQZLSS varchar(50) NULL,FQSFZCYX varchar(50) NULL,FSZLSS varchar(50) NULL,FSSFZCYX varchar(50) NULL,GFZLSS varchar(50) NULL,GFSFZCYX varchar(50) NULL,QTZLSS varchar(50) NULL,QTSFZCYX varchar(50) NULL,CZWT varchar(50) NULL,XCCLYJ nvarchar(50) NULL,QT varchar(4000) NULL,CJR varchar(50) NULL,CJSJ datetime NULL,XGR varchar(50) NULL,XGSJ datetime NULL,ORGID varchar(50) NULL,ZLSS varchar(50) NULL,WRYDZ varchar(50) NULL,JCR varchar(50) NULL,ZFZH varchar(50) NULL,WPF varchar(50) NULL,WSP varchar(50) NULL,WYS varchar(50) NULL)</string>
+		<string>CREATE TABLE if not exists T_YDZF_FLFG( FGBH VARCHAR(50) NULL, FGMC VARCHAR(500) NULL,FIDH VARCHAR(50) NULL,  SFML VARCHAR(50) NULL,  FGZW VARCHAR(4000) NULL,FJZZBH VARCHAR(50) NULL, WJMC VARCHAR(50) NULL, MLLX VARCHAR(50) NULL,  CJR VARCHAR(50) NULL,CJSJ VARCHAR(50) NULL, XGR VARCHAR(30) NULL, XGSJ VARCHAR(50) NULL,WJLJ VARCHAR(800) NULL,DLDM VARCHAR(4) NULL,XLDM VARCHAR(4) NULL,SFYX VARCHAR(1) NULL,HZ VARCHAR(10) NULL,WJDX VARCHAR(50) NULL,PXH INTEGER,PXM INTEGER,ORGID VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE if not exists T_YDZF_FLFG_TEMP( FGBH VARCHAR(50) NULL, FGMC VARCHAR(500) NULL,FIDH VARCHAR(50) NULL,  SFML VARCHAR(50) NULL,  FGZW VARCHAR(4000) NULL,FJZZBH VARCHAR(50) NULL, WJMC VARCHAR(50) NULL, MLLX VARCHAR(50) NULL,  CJR VARCHAR(50) NULL,CJSJ VARCHAR(50) NULL, XGR VARCHAR(30) NULL, XGSJ VARCHAR(50) NULL,WJLJ VARCHAR(800) NULL,DLDM VARCHAR(4) NULL,XLDM VARCHAR(4) NULL,SFYX VARCHAR(1) NULL,HZ VARCHAR(10) NULL,WJDX VARCHAR(50) NULL,PXH INTEGER,PXM INTEGER,ORGID VARCHAR(50) NULL)</string>
+		<string>CREATE TABLE if not exists T_YDZF_HBJMC_JCDDCW (SJQX   VARCHAR(100)    not null,HBJMC  VARCHAR(200),JCDDCW  VARCHAR(200),CJR   VARCHAR(100),CJSJ   DATE, XGR VARCHAR(100),XGSJ    DATE, ORGID  VARCHAR(100), BZ   VARCHAR(200));</string>
+		<string>CREATE TABLE if not exists T_YDZF_HBJMC_JCDDCW_TEMP (SJQX   VARCHAR(100)    not null,HBJMC  VARCHAR(200),JCDDCW  VARCHAR(200),CJR   VARCHAR(100),CJSJ   DATE, XGR VARCHAR(100),XGSJ    DATE, ORGID  VARCHAR(100), BZ   VARCHAR(200));</string>
+	</array>
+	<key>InitialDatas</key>
+	<array/>
+	<key>DBName</key>
+	<string>boandaProject.db</string>
+	<key>MenuItems</key>
+	<array>
+		<dict>
+			<key>PageTitle</key>
+			<string>现场执法</string>
+			<key>Menus</key>
+			<array>
+				<dict>
+					<key>MenuTitle</key>
+					<string>询问笔录</string>
+					<key>MenuIcon</key>
+					<string>icon_xwbl.png</string>
+					<key>ViewController</key>
+					<string>QueryWriteController</string>
+					<key>NibName</key>
+					<string>QueryWriteController</string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>现场检查记录表</string>
+					<key>MenuIcon</key>
+					<string>icon_default.png</string>
+					<key>ViewController</key>
+					<string>FieldMonitorViewController</string>
+					<key>NibName</key>
+					<string></string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>现场勘查笔录</string>
+					<key>MenuIcon</key>
+					<string>icon_xcjcb.png</string>
+					<key>ViewController</key>
+					<string>SiteInforcementConroller</string>
+					<key>NibName</key>
+					<string>SiteInforcementConroller</string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>现场取证</string>
+					<key>MenuIcon</key>
+					<string>icon_xcqz.png</string>
+					<key>ViewController</key>
+					<string>InvestigateEvidenceVC</string>
+					<key>NibName</key>
+					<string>InvestigateEvidenceVC</string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>整改意见书</string>
+					<key>MenuIcon</key>
+					<string>icon_xzcf.png</string>
+					<key>ViewController</key>
+					<string>InspectOpinionViewController</string>
+					<key>NibName</key>
+					<string>InspectOpinionViewController</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>PageTitle</key>
+			<string>任务管理</string>
+			<key>Menus</key>
+			<array>
+				<dict>
+					<key>MenuTitle</key>
+					<string>待办任务</string>
+					<key>MenuIcon</key>
+					<string>icon_dbrw.png</string>
+					<key>ViewController</key>
+					<string>TodoTaskListViewController</string>
+					<key>NibName</key>
+					<string></string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>已办任务</string>
+					<key>MenuIcon</key>
+					<string>icon_ybrw.png</string>
+					<key>ViewController</key>
+					<string>DoneTaskListViewController</string>
+					<key>NibName</key>
+					<string>DoneTaskListViewController</string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>任务指派</string>
+					<key>MenuIcon</key>
+					<string>icon_rwzp.png</string>
+					<key>ViewController</key>
+					<string>SendTaskViewController</string>
+					<key>NibName</key>
+					<string>SendTaskViewController</string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>任务台账</string>
+					<key>MenuIcon</key>
+					<string>icon_zftz.png</string>
+					<key>ViewController</key>
+					<string>ZFTZListViewController</string>
+					<key>NibName</key>
+					<string>ZFTZListViewController</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>PageTitle</key>
+			<string>信息查询</string>
+			<key>Menus</key>
+			<array>
+				<dict>
+					<key>MenuTitle</key>
+					<string>一厂一档</string>
+					<key>MenuIcon</key>
+					<string>icon_yqyd.png</string>
+					<key>ViewController</key>
+					<string>WryQueryViewController</string>
+					<key>NibName</key>
+					<string>WryQueryViewController</string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>地图查询</string>
+					<key>MenuIcon</key>
+					<string>icon_dtcx.png</string>
+					<key>ViewController</key>
+					<string>MapQueryViewController</string>
+					<key>NibName</key>
+					<string>MapQueryViewController</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>PageTitle</key>
+			<string>环保手册</string>
+			<key>Menus</key>
+			<array>
+				<dict>
+					<key>MenuTitle</key>
+					<string>法律法规</string>
+					<key>MenuIcon</key>
+					<string>icon_flfg.png</string>
+					<key>ViewController</key>
+					<string>LawsListViewController</string>
+					<key>NibName</key>
+					<string></string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>环保标准</string>
+					<key>MenuIcon</key>
+					<string>icon_hjbhbz.png</string>
+					<key>ViewController</key>
+					<string>StandardLawsViewController</string>
+					<key>NibName</key>
+					<string></string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>危险化学品</string>
+					<key>MenuIcon</key>
+					<string>icon_wxpml.png</string>
+					<key>ViewController</key>
+					<string>ChemitryBookViewController</string>
+					<key>NibName</key>
+					<string></string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>应急管理</string>
+					<key>MenuIcon</key>
+					<string>icon_yjgl.png</string>
+					<key>ViewController</key>
+					<string>EmergencyPlayViewController</string>
+					<key>NibName</key>
+					<string></string>
+				</dict>
+				<dict>
+					<key>MenuTitle</key>
+					<string>作业指导书</string>
+					<key>MenuIcon</key>
+					<string>icon_zyzds.png</string>
+					<key>ViewController</key>
+					<string>HandBookListViewController</string>
+					<key>NibName</key>
+					<string></string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
